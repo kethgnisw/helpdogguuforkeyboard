@@ -365,63 +365,6 @@
     init();
   </script>
 
-  <!--
-  ---------------------------------------------------------------------
-  OPTIONAL BACKEND (Node.js Express) – Amazon product integration proxy
-  ---------------------------------------------------------------------
-  Why: Browsers cannot fetch amazon.in directly due to CORS. This tiny
-  server fetches the page and extracts Open Graph tags (title, image).
-  For price, Amazon HTML changes often; consider Amazon PA-API (official)
-  or maintain a robust scraper with cheerio + selectors.
 
-  // server.js
-  import express from 'express';
-  import fetch from 'node-fetch';
-  import * as cheerio from 'cheerio';
-  const app = express();
-
-  app.get('/api/product', async (req, res)=>{
-    try{
-      const url = req.query.url;
-      if(!url) return res.status(400).json({error:'Missing url'});
-      const r = await fetch(url, { headers:{ 'user-agent': 'Mozilla/5.0' }});
-      const html = await r.text();
-      const $ = cheerio.load(html);
-      const meta = (p)=> $(`meta[property="${p}"]`).attr('content') || '';
-
-      // Best-effort extraction
-      const title = $('#productTitle').text().trim() || meta('og:title');
-      const image = $('#imgBlkFront, #landingImage').attr('src') || meta('og:image');
-      // Price can be in many places on Amazon; try a few IDs/classes
-      const priceTxt = (
-        $('#priceblock_ourprice').text() ||
-        $('#priceblock_dealprice').text() ||
-        $('[data-a-color="price"] .a-offscreen').first().text() ||
-        meta('product:price:amount')
-      ).replace(/[^0-9.]/g,'');
-      const price = priceTxt ? Math.round(Number(priceTxt)) : null;
-
-      const description = $('#feature-bullets li').map((i,el)=>$(el).text().trim()).get().slice(0,3).join(' • ');
-      res.json({ title, image, price, description, url });
-    }catch(e){ res.status(500).json({error: e.message}); }
-  });
-
-  app.use(express.static('public'));
-  app.listen(3000, ()=> console.log('Server on http://localhost:3000'));
-
-  DEPLOY NOTES
-  - Put this HTML file in /public/index.html
-  - Place your QR image at /public/qr.png and set src to "qr.png"
-  - Run: npm i express node-fetch cheerio && node server.js
-  - Swap demo localStorage with a DB (e.g., MongoDB, Supabase, Firebase)
-
-  RECORDING DONATIONS SERVER-SIDE (pseudo)
-  POST /api/donations { name, amount }
-  -> validate & store
-  GET  /api/donations
-  -> return { totalRaised, donors:[{name,totalAmount}], history:[{name,amount,ts}] }
-
-  Then in the client, replace localStorage reads with these endpoints.
-  -->
 </body>
 </html>
