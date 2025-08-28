@@ -1,0 +1,368 @@
+<html lang="en"><head><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/content/location/location.js" id="eppiocemhmnlbhjplcgkofciiegomcon"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/extend-native-history-api.js"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/requests.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fund DOGGIEE for Keyboard 🐶</title>
+  <meta name="description" content="Chip in to help purchase a Logitech keyboard. Track progress, see donors, and donate securely via QR or card/UPI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;           /* deep blue-black */
+      --card:#111a2b;         /* slightly lighter */
+      --ink:#e7ecf6;          /* near-white text */
+      --muted:#a8b3c7;        /* secondary text */
+      --brand:#6aa6ff;        /* accent */
+      --brand-2:#7ef0d2;      /* accent 2 */
+      --danger:#ff6b6b;
+      --success:#7cf59a;
+      --radius:18px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); background:radial-gradient(1200px 800px at 20% -10%, #17213a, transparent),
+      radial-gradient(1000px 600px at 120% -10%, #10203a, transparent), var(--bg);
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px; margin:0 auto; padding:24px;}
+
+    header{
+      display:flex; align-items:center; gap:18px; margin-bottom:18px;
+    }
+    .logo{width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg,var(--brand),var(--brand-2)); display:grid; place-items:center; font-weight:800; color:#0b1220; box-shadow:var(--shadow)}
+    .title h1{margin:0; font-size:clamp(20px,3vw,28px)}
+    .title p{margin:4px 0 0; color:var(--muted); font-size:14px}
+
+    .grid{display:grid; grid-template-columns:1.1fr 1fr; gap:22px}
+    @media (max-width: 880px){ .grid{grid-template-columns:1fr;}}
+
+    .card{background:rgba(17,26,43,.7); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .card .inner{padding:18px}
+
+    .product{
+      display:grid; grid-template-columns: 280px 1fr; gap:18px; align-items:start;
+    }
+    @media (max-width:680px){ .product{grid-template-columns:1fr} }
+    .product .media{background:linear-gradient(135deg, rgba(106,166,255,.15), rgba(126,240,210,.08)); border-radius:14px; overflow:hidden; display:grid; place-items:center; padding:10px}
+    .product img{max-width:100%; height:auto; display:block}
+    .product h2{margin:0 0 8px; font-size:clamp(18px,2.5vw,24px)}
+    .price{font-size:20px; font-weight:700; background:linear-gradient(90deg,var(--brand),var(--brand-2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .desc{color:var(--muted); line-height:1.5}
+
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
+    button, .ghost{
+      appearance:none; border:0; border-radius:14px; padding:12px 16px; font-weight:700; cursor:pointer; transition:.2s transform ease,.2s opacity ease; box-shadow:var(--shadow);
+    }
+    .primary{background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#0b1220}
+    .ghost{background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--ink); text-decoration:none}
+    button:active{transform:translateY(1px)}
+
+    .progress{
+      margin-top:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; overflow:hidden; height:14px;
+    }
+    .progress > div{height:100%; width:0; background:linear-gradient(90deg,var(--brand),var(--brand-2)); transition:width .6s ease}
+    .progress-meta{display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:13px; margin-top:6px}
+
+    .pay{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    @media (max-width:860px){ .pay{grid-template-columns:1fr} }
+    .qr{display:grid; place-items:center; background:rgba(255,255,255,.03); border-radius:12px; padding:16px; border:1px dashed rgba(255,255,255,.15)}
+    .qr img{max-width:260px; width:100%; height:auto; border-radius:8px}
+    .qr small{color:var(--muted)}
+
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    @media (max-width:680px){ .stats{grid-template-columns:1fr 1fr} }
+    .stat{padding:14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08)}
+    .stat .k{font-size:22px; font-weight:800}
+    .stat .l{color:var(--muted); font-size:12px}
+
+    .donors li{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06)}
+    .donors li:last-child{border-bottom:0}
+    .pill{font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(126,240,210,.15); color:#bffbe9; border:1px solid rgba(126,240,210,.25)}
+
+    footer{color:var(--muted); text-align:center; padding:32px 0 12px; font-size:13px}
+
+    /* modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(7,9,14,.6); backdrop-filter: blur(6px);}
+    .modal.open{display:grid}
+    .sheet{width:min(560px,92vw); background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:18px; box-shadow:var(--shadow)}
+    .sheet .inner{padding:18px}
+    .sheet h3{margin:0 0 10px}
+    .field{display:flex; align-items:center; gap:10px; margin:10px 0}
+    .field input{flex:1; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.06); color:var(--ink); border:1px solid rgba(255,255,255,.12)}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .help{color:var(--muted); font-size:12px}
+  </style>
+<script bis_use="true" type="text/javascript" charset="utf-8" data-bis-config="[&quot;facebook.com/&quot;,&quot;twitter.com/&quot;,&quot;youtube-nocookie.com/embed/&quot;,&quot;//vk.com/&quot;,&quot;//www.vk.com/&quot;,&quot;linkedin.com/&quot;,&quot;//www.linkedin.com/&quot;,&quot;//instagram.com/&quot;,&quot;//www.instagram.com/&quot;,&quot;//www.google.com/recaptcha/api2/&quot;,&quot;//hangouts.google.com/webchat/&quot;,&quot;//www.google.com/calendar/&quot;,&quot;//www.google.com/maps/embed&quot;,&quot;spotify.com/&quot;,&quot;soundcloud.com/&quot;,&quot;//player.vimeo.com/&quot;,&quot;//disqus.com/&quot;,&quot;//tgwidget.com/&quot;,&quot;//js.driftt.com/&quot;,&quot;friends2follow.com&quot;,&quot;/widget&quot;,&quot;login&quot;,&quot;//video.bigmir.net/&quot;,&quot;blogger.com&quot;,&quot;//smartlock.google.com/&quot;,&quot;//keep.google.com/&quot;,&quot;/web.tolstoycomments.com/&quot;,&quot;moz-extension://&quot;,&quot;chrome-extension://&quot;,&quot;/auth/&quot;,&quot;//analytics.google.com/&quot;,&quot;adclarity.com&quot;,&quot;paddle.com/checkout&quot;,&quot;hcaptcha.com&quot;,&quot;recaptcha.net&quot;,&quot;2captcha.com&quot;,&quot;accounts.google.com&quot;,&quot;www.google.com/shopping/customerreviews&quot;,&quot;buy.tinypass.com&quot;,&quot;gstatic.com&quot;,&quot;secureir.ebaystatic.com&quot;,&quot;docs.google.com&quot;,&quot;contacts.google.com&quot;,&quot;github.com&quot;,&quot;mail.google.com&quot;,&quot;chat.google.com&quot;,&quot;audio.xpleer.com&quot;,&quot;keepa.com&quot;,&quot;static.xx.fbcdn.net&quot;,&quot;sas.selleramp.com&quot;,&quot;1plus1.video&quot;,&quot;console.googletagservices.com&quot;,&quot;//lnkd.demdex.net/&quot;,&quot;//radar.cedexis.com/&quot;,&quot;//li.protechts.net/&quot;,&quot;challenges.cloudflare.com/&quot;,&quot;ogs.google.com&quot;]" src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/executors/traffic.js"></script></head>
+<body __processed_e444b3f5-9c73-43c4-9e44-4fda35122854__="true" bis_register="W3sibWFzdGVyIjp0cnVlLCJleHRlbnNpb25JZCI6ImVwcGlvY2VtaG1ubGJoanBsY2drb2ZjaWllZ29tY29uIiwiYWRibG9ja2VyU3RhdHVzIjp7IkRJU1BMQVkiOiJkaXNhYmxlZCIsIkZBQ0VCT09LIjoiZGlzYWJsZWQiLCJUV0lUVEVSIjoiZGlzYWJsZWQiLCJSRURESVQiOiJkaXNhYmxlZCIsIlBJTlRFUkVTVCI6ImRpc2FibGVkIiwiSU5TVEFHUkFNIjoiZGlzYWJsZWQiLCJUSUtUT0siOiJkaXNhYmxlZCIsIkxJTktFRElOIjoiZGlzYWJsZWQiLCJDT05GSUciOiJkaXNhYmxlZCJ9LCJ2ZXJzaW9uIjoiMi4wLjI2Iiwic2NvcmUiOjIwMDI2fV0=">
+  <div class="wrap" bis_skin_checked="1">
+    <header>
+      <div class="logo" bis_skin_checked="1">₹</div>
+      <div class="title" bis_skin_checked="1">
+        <h1>Fund the EvoFox Keyboard for DOGGIE 🐶</h1>
+        <p>Every rupee brings us closer. Track progress below and donate securely.</p>
+      </div>
+    </header>
+
+    <div class="grid" bis_skin_checked="1">
+      <!-- Left: Product & Progress -->
+      <section class="card">
+        <div class="inner product" bis_skin_checked="1">
+          <div class="media" bis_skin_checked="1"><img id="product-image" alt="EvoFox Ronin Wireless Mechanical Keyboard" src="https://m.media-amazon.com/images/I/618LUuAljQL._SX679_.jpg"></div>
+          <div bis_skin_checked="1">
+            <h2 id="product-title">EvoFox Ronin Wireless Mechanical Keyboard</h2>
+            <div class="price" id="product-price" bis_skin_checked="1">₹3,899</div>
+            <p class="desc" id="product-desc">Compact wireless keyboard that pairs with up to 3 devices. Quiet, comfortable typing with long battery life.</p>
+            <div class="actions" bis_skin_checked="1">
+              <button class="primary" id="donateBtn">Donate Now</button>
+              <a class="ghost" id="amazonLink" target="_blank" rel="noopener" href="https://amazon.in/dp/B0F66JWD47/?coliid=I5WDY8YXD1ICM&amp;colid=1L9ZR372LNEKK&amp;psc=1&amp;ref_=list_c_wl_lv_ov_lig_dp_it">View on Amazon</a>
+            </div>
+            <div class="progress" aria-label="fundraising progress" bis_skin_checked="1"><div id="bar" bis_skin_checked="1" style="width: 6%;"></div></div>
+            <div class="progress-meta" bis_skin_checked="1">
+              <span id="raisedLabel">Raised: ₹224</span>
+              <span id="remainingLabel">Remaining: ₹3,675</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Payment Options & Stats -->
+      <section class="card">
+        <div class="inner pay" bis_skin_checked="1">
+          <div bis_skin_checked="1">
+            <h3>Pay via QR</h3>
+            <div class="qr" bis_skin_checked="1">
+              <!-- Replace the src below with your actual QR image path or URL -->
+              <img src="https://raw.githubusercontent.com/kethgnisw/helpdogguuforkeyboard/refs/heads/main/QR1.jpeg">
+              <small>Scan with any UPI app to donate instantly.</small>
+            </div>
+          </div>
+          <div bis_skin_checked="1">
+            <h3>Campaign Stats</h3>
+            <div class="stats" bis_skin_checked="1">
+              <div class="stat" bis_skin_checked="1"><div class="k" id="statRaised" bis_skin_checked="1">₹224</div><div class="l" bis_skin_checked="1">Total Raised</div></div>
+              <div class="stat" bis_skin_checked="1"><div class="k" id="statDonors" bis_skin_checked="1">5</div><div class="l" bis_skin_checked="1">Donors</div></div>
+              <div class="stat" bis_skin_checked="1"><div class="k" id="statGoal" bis_skin_checked="1">₹3,899</div><div class="l" bis_skin_checked="1">Target</div></div>
+            </div>
+            <h3 style="margin-top:16px">Top Donors</h3>
+            <ul class="donors" id="donorList"><li><span>1. Harshpreet</span><span class="pill">₹100</span></li><li><span>2. Vanshika</span><span class="pill">₹50</span></li><li><span>3. HarshPreet</span><span class="pill">₹49</span></li><li><span>4. PHYSICCCC</span><span class="pill">₹15</span></li><li><span>5. rizztogi</span><span class="pill">₹10</span></li></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Donation History -->
+    <section class="card" style="margin-top:22px">
+      <div class="inner" bis_skin_checked="1">
+        <h3>Recent Donations</h3>
+        <ul class="donors" id="history"><li><span>HarshPreet <small class="help">(28/8/2025, 14:39:20)</small></span><span class="pill">₹49</span></li><li><span>Harshpreet <small class="help">(28/8/2025, 14:36:36)</small></span><span class="pill">₹100</span></li><li><span>Vanshika <small class="help">(28/8/2025, 14:14:38)</small></span><span class="pill">₹50</span></li><li><span>rizztogi <small class="help">(28/8/2025, 12:46:53)</small></span><span class="pill">₹10</span></li><li><span>PHYSICCCC <small class="help">(28/8/2025, 12:45:09)</small></span><span class="pill">₹15</span></li></ul>
+      </div>
+    </section>
+
+    <footer>
+      Built with ❤️ for a good cause. This is a demo—connect a real payment gateway before going live.
+    </footer>
+  </div>
+
+  <!-- Donate Modal -->
+  <div class="modal" id="modal" bis_skin_checked="1">
+    <div class="sheet" bis_skin_checked="1">
+      <div class="inner" bis_skin_checked="1">
+        <h3>Donate</h3>
+        <div class="field" bis_skin_checked="1">
+          <input id="donorName" placeholder="Your name (optional)">
+        </div>
+        <div class="row" bis_skin_checked="1">
+          <button class="ghost quick" data-amt="100">₹100</button>
+          <button class="ghost quick" data-amt="250">₹250</button>
+          <button class="ghost quick" data-amt="500">₹500</button>
+          <button class="ghost quick" data-amt="1000">₹1000</button>
+        </div>
+        <div class="field" bis_skin_checked="1">
+          <input id="amount" type="number" min="1" step="1" placeholder="Enter custom amount (₹)">
+        </div>
+        <div class="row" bis_skin_checked="1">
+          <button class="primary" id="confirmDonate">Confirm &amp; Record Donation</button>
+          <button class="ghost" id="closeModal">Cancel</button>
+        </div>
+        <p class="help">This demo records donations locally (in your browser) so you can preview the experience.
+          Replace the handler with Razorpay/Stripe/UPI collection in production.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * CONFIG
+     * ------------------------------------------------------------------
+     */
+    const AMAZON_URL = "https://amazon.in/dp/B0F66JWD47/?coliid=I5WDY8YXD1ICM&colid=1L9ZR372LNEKK&psc=1&ref_=list_c_wl_lv_ov_lig_dp_it";
+    const DEFAULT_TARGET_PRICE = 3899; // Fallback target (₹) if live price can't be fetched
+
+    /**
+     * PRODUCT FETCHING (from Amazon)
+     * ------------------------------------------------------------------
+     * Browsers block direct fetches from Amazon due to CORS. Two strategies:
+     *   1) Backend proxy endpoint (recommended):
+     *        GET /api/product?url=<AMAZON_URL>
+     *        -> { title, price, image, description, url }
+     *   2) Manual seed (fallback below) if backend isn't set up yet.
+     */
+    async function fetchProduct() {
+      // Attempt to call a backend proxy if present. If not, we gracefully fall back to manual data.
+      try {
+        const res = await fetch(`/api/product?url=${encodeURIComponent(AMAZON_URL)}`, { headers: {"accept":"application/json"}});
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.title) return data;
+        }
+      } catch (e) { /* ignore and use fallback */ }
+
+      // Fallback: seed with editable placeholders (update these to match the live listing)
+      return {
+        title: "EvoFox Ronin Wireless Mechanical Keyboard",
+        price: DEFAULT_TARGET_PRICE, // in INR; update to match current listing
+        image: "https://m.media-amazon.com/images/I/618LUuAljQL._SX679_.jpg", // representative image URL
+        description: "Compact wireless keyboard that pairs with up to 3 devices. Quiet, comfortable typing with long battery life.",
+        url: AMAZON_URL
+      };
+    }
+
+    /**
+     * DONATION STORAGE (demo only)
+     * ------------------------------------------------------------------
+     * We store donations in localStorage for preview. Replace with your backend DB.
+     */
+    const store = {
+      key: "fundraiser.v1",
+      read(){ try { return JSON.parse(localStorage.getItem(this.key)) || { donations: [] } } catch { return { donations: [] } } },
+      write(data){ localStorage.setItem(this.key, JSON.stringify(data)); }
+    };
+
+    function addDonation(name, amount){
+      const data = store.read();
+      const entry = { name: name?.trim() || "Anonymous", amount: Number(amount), ts: Date.now() };
+      data.donations.unshift(entry);
+      // keep only last 100 for demo
+      data.donations = data.donations.slice(0,100);
+      store.write(data);
+      return entry;
+    }
+
+    function summarizeTopDonors(donations, topN = 5){
+      const map = new Map();
+      donations.forEach(d => map.set(d.name, (map.get(d.name)||0) + d.amount));
+      return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]).slice(0, topN);
+    }
+
+    /**
+     * UI BINDINGS
+     * ------------------------------------------------------------------
+     */
+    const el = {
+      title: document.getElementById('product-title'),
+      price: document.getElementById('product-price'),
+      image: document.getElementById('product-image'),
+      desc: document.getElementById('product-desc'),
+      bar: document.getElementById('bar'),
+      raisedLabel: document.getElementById('raisedLabel'),
+      remainingLabel: document.getElementById('remainingLabel'),
+      statRaised: document.getElementById('statRaised'),
+      statDonors: document.getElementById('statDonors'),
+      statGoal: document.getElementById('statGoal'),
+      donorList: document.getElementById('donorList'),
+      history: document.getElementById('history'),
+      amazonLink: document.getElementById('amazonLink'),
+      donateBtn: document.getElementById('donateBtn'),
+      modal: document.getElementById('modal'),
+      closeModal: document.getElementById('closeModal'),
+      quicks: Array.from(document.querySelectorAll('.quick')),
+      amount: document.getElementById('amount'),
+      donorName: document.getElementById('donorName'),
+      confirmDonate: document.getElementById('confirmDonate')
+    };
+
+    const fmt = new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 });
+
+    let TARGET = DEFAULT_TARGET_PRICE; // will update from live price if available
+
+    function recalcUI(){
+      const donations = store.read().donations;
+      const total = donations.reduce((s,d)=>s+d.amount,0);
+      const pct = Math.min(100, Math.round((total / TARGET) * 100));
+      el.bar.style.width = pct + '%';
+      el.raisedLabel.textContent = `Raised: ${fmt.format(total)}`;
+      el.remainingLabel.textContent = `Remaining: ${fmt.format(Math.max(0, TARGET-total))}`;
+      el.statRaised.textContent = fmt.format(total);
+      el.statDonors.textContent = new Intl.NumberFormat('en-IN').format(donations.length);
+      el.statGoal.textContent = fmt.format(TARGET);
+
+      // render top donors
+      const top = summarizeTopDonors(donations);
+      el.donorList.innerHTML = top.map(([name, amt], i)=>`<li><span>${i+1}. ${name}</span><span class="pill">${fmt.format(amt)}</span></li>`).join('') || '<li><span>No donors yet</span><span class="pill">Be the first!</span></li>';
+
+      // render history (latest 10)
+      el.history.innerHTML = donations.slice(0,10).map(d=>{
+        const date = new Date(d.ts).toLocaleString('en-IN', { hour12:false });
+        return `<li><span>${d.name} <small class="help">(${date})</small></span><span class="pill">${fmt.format(d.amount)}</span></li>`;
+      }).join('') || '<li><span>No donations recorded in this browser.</span><span class="pill">—</span></li>';
+    }
+
+    function openModal(){ el.modal.classList.add('open'); el.amount.focus(); }
+    function closeModal(){ el.modal.classList.remove('open'); }
+
+    el.donateBtn.addEventListener('click', openModal);
+    el.closeModal.addEventListener('click', closeModal);
+    el.modal.addEventListener('click', (e)=>{ if(e.target === el.modal) closeModal(); });
+    el.quicks.forEach(b=> b.addEventListener('click', ()=>{ el.amount.value = b.dataset.amt; }));
+
+    el.confirmDonate.addEventListener('click', async ()=>{
+      const amount = Number(el.amount.value);
+      if(!amount || amount <= 0){ alert('Please enter a valid amount'); return; }
+      const name = el.donorName.value || 'Anonymous';
+
+      /**
+       * REAL PAYMENT INTEGRATION (replace this block)
+       * ----------------------------------------------------------------
+       * Example with Razorpay:
+       * 1) Create order on your server -> returns order_id
+       * 2) Open Razorpay Checkout with the order_id
+       * 3) On success, POST the payment to your server to verify & record
+       * 4) Refresh totals from your server
+       *
+       * fetch('/api/create-order', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ amount })})
+       *  .then(r=>r.json())
+       *  .then(({order_id})=> new Razorpay({ key: RZP_KEY, amount: amount*100, currency:'INR', order_id, prefill:{ name } }).open());
+       */
+
+      // DEMO ONLY: instantly record locally
+      addDonation(name, amount);
+      recalcUI();
+      closeModal();
+      el.amount.value = '';
+      el.donorName.value = '';
+    });
+
+    async function init(){
+      // Load product details
+      const p = await fetchProduct();
+      el.title.textContent = p.title;
+      el.price.textContent = typeof p.price === 'number' ? fmt.format(p.price) : (p.price || '—');
+      el.image.src = p.image; el.image.alt = p.title;
+      el.desc.textContent = p.description || 'Logitech keyboard';
+      el.amazonLink.href = p.url;
+
+      // set goal from price if available
+      TARGET = (typeof p.price === 'number' && p.price>0) ? p.price : DEFAULT_TARGET_PRICE;
+
+      recalcUI();
+    }
+
+    init();
+  </script>
+
+
+
+</body></html>
